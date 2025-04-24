@@ -50,17 +50,17 @@ export const actions: Action[] = [
     canApply: (stack: Stack) => stack.selected()?.stack_id != null,
     keys: [<Icon name="IconCommandKey" />, <Icon name="IconShiftKey" />, "U"],
     matchKeyEvent: (event: KeyboardEvent) =>
-      matchKeyEvent(event, { meta: true, shift: true, key: "u" }),
+      matchKeyEvent(event, { alt: true, shift: true, key: "u" }),
     trigger: (stack: Stack) => {
       modes.activate(stack, setContentTypeAction);
     },
   },
 
   {
-    name: "Yak shave",
+    name: "alt: true",
     keys: [<Icon name="IconCommandKey" />, "Y"],
     matchKeyEvent: (event: KeyboardEvent) =>
-      matchKeyEvent(event, { meta: true, code: "KeyY" }),
+      matchKeyEvent(event, { alt: true, code: "KeyY" }),
     canApply: (stack: Stack) => !!stack.selected_item(),
     trigger: (stack: Stack) => {
       const item = stack.selected_item();
@@ -81,7 +81,7 @@ export const actions: Action[] = [
     name: "Yak on here and up",
     keys: [<Icon name="IconCommandKey" />, <Icon name="IconShiftKey" />, "Y"],
     matchKeyEvent: (event: KeyboardEvent) =>
-      matchKeyEvent(event, { meta: true, shift: true, code: "KeyY" }),
+      matchKeyEvent(event, { alt: true, shift: true, code: "KeyY" }),
     canApply: (stack: Stack) => !!stack.selected_item(),
     trigger: (stack: Stack) => {
       const item = stack.selected_item();
@@ -102,7 +102,7 @@ export const actions: Action[] = [
     name: "Stash clip",
     keys: [<Icon name="IconCommandKey" />, "S"],
     matchKeyEvent: (event: KeyboardEvent) =>
-      matchKeyEvent(event, { meta: true, code: "KeyS" }),
+      matchKeyEvent(event, { alt: true, code: "KeyS" }),
     canApply: (stack: Stack) => stack.selected()?.stack_id != null,
     trigger: (stack: Stack) => {
       modes.activate(stack, addToStackMode);
@@ -113,7 +113,7 @@ export const actions: Action[] = [
     name: "Edit clip",
     keys: [<Icon name="IconCommandKey" />, <Icon name="IconReturnKey" />],
     matchKeyEvent: (event: KeyboardEvent) =>
-      matchKeyEvent(event, { meta: true, code: "Enter" }),
+      matchKeyEvent(event, { alt: true, code: "Enter" }),
     canApply: (stack: Stack) => {
       const item = stack.selected_item();
       if (!item) return false;
@@ -126,7 +126,7 @@ export const actions: Action[] = [
     name: "Pipe clip",
     keys: [<Icon name="IconCommandKey" />, "P"],
     matchKeyEvent: (event: KeyboardEvent) =>
-      matchKeyEvent(event, { meta: true, code: "KeyP" }),
+      matchKeyEvent(event, { alt: true, code: "KeyP" }),
     trigger: (stack: Stack) => modes.activate(stack, pipeToCommand),
     canApply: (stack: Stack) => !!stack.selected_item(),
   },
@@ -135,7 +135,7 @@ export const actions: Action[] = [
     name: "Delete clip",
     keys: [<Icon name="IconCommandKey" />, "DEL"],
     matchKeyEvent: (event: KeyboardEvent) =>
-      matchKeyEvent(event, { meta: true, code: "Backspace" }),
+      matchKeyEvent(event, { alt: true, code: "Backspace" }),
     canApply: (stack: Stack) => !!stack.selected_item(),
     trigger: (stack: Stack) => {
       const item = stack.selected_item();
@@ -153,7 +153,7 @@ export const actions: Action[] = [
       <Icon name="IconReturnKey" />,
     ],
     matchKeyEvent: (event: KeyboardEvent) =>
-      matchKeyEvent(event, { meta: true, alt: true, code: "Enter" }),
+      matchKeyEvent(event, { alt: true, alt: true, code: "Enter" }),
     canApply: (stack: Stack) => {
       const item = stack.selected_stack();
       if (!item) return false;
@@ -166,7 +166,7 @@ export const actions: Action[] = [
     name: "Pipe stack",
     keys: [<Icon name="IconAltKey" />, <Icon name="IconCommandKey" />, "P"],
     matchKeyEvent: (event: KeyboardEvent) =>
-      matchKeyEvent(event, { meta: true, alt: true, code: "KeyP" }),
+      matchKeyEvent(event, { alt: true, alt: true, code: "KeyP" }),
     trigger: (stack: Stack) => modes.activate(stack, pipeStackToShell),
     canApply: (stack: Stack) => !!stack.selected_item(),
   },
@@ -175,7 +175,7 @@ export const actions: Action[] = [
     name: "Delete stack",
     keys: [<Icon name="IconAltKey" />, <Icon name="IconCommandKey" />, "DEL"],
     matchKeyEvent: (event: KeyboardEvent) =>
-      matchKeyEvent(event, { meta: true, alt: true, code: "Backspace" }),
+      matchKeyEvent(event, { alt: true, code: "Backspace" }),
     canApply: (stack: Stack) => {
       return !!stack.selected_stack();
     },
@@ -205,10 +205,7 @@ export const actions: Action[] = [
 export const attemptAction = (event: KeyboardEvent, stack: Stack): boolean => {
   for (const action of actions) {
     if (action.canApply && !action.canApply(stack)) continue;
-    if (
-      action.trigger && action.matchKeyEvent &&
-      action.matchKeyEvent(event)
-    ) {
+    if (action.trigger && action.matchKeyEvent && action.matchKeyEvent(event)) {
       event.preventDefault();
       action.trigger(stack);
       return true;

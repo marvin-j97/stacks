@@ -54,7 +54,7 @@ export const lightThemeClass = createTheme(vars, {
 });
 
 globalStyle("html, body", {
-  fontFamily: "ui-monospace",
+  fontFamily: "ui-monospace, monospace",
   backgroundColor: "transparent",
   padding: "10px",
   letterSpacing: "-0.02ch",
@@ -110,7 +110,7 @@ globalStyle(".markdown input", {
 
 globalStyle(".markdown blockquote", {
   paddingLeft: "2ch",
-  borderLeft: ("4px solid " + vars.borderColor),
+  borderLeft: "4px solid " + vars.borderColor,
   marginBlockStart: "0",
   marginBlockEnd: "0",
   marginInlineStart: "0",

@@ -17,13 +17,11 @@ const state = (() => {
   const availOptions: Signal<Item[]> = signal([]);
 
   const options = computed(() =>
-    availOptions.value
-      .filter((item) =>
+    availOptions.value.filter(
+      (item) =>
         currFilter.value == "" ||
-        item.name.toLowerCase().includes(
-          currFilter.value.toLowerCase(),
-        )
-      )
+        item.name.toLowerCase().includes(currFilter.value.toLowerCase()),
+    ),
   );
 
   effect(() => {
@@ -110,22 +108,17 @@ export default {
 
     ret.push({
       name: "Create new",
-      keys: [
-        <Icon name="IconCommandKey" />,
-        <Icon name="IconReturnKey" />,
-      ],
+      keys: [<Icon name="IconCommandKey" />, <Icon name="IconReturnKey" />],
       onMouseDown: () => {
         state.accept_meta(stack, modes);
       },
     });
 
-    ret.push(
-      {
-        name: "Back",
-        keys: ["ESC"],
-        onMouseDown: () => modes.deactivate(),
-      },
-    );
+    ret.push({
+      name: "Back",
+      keys: ["ESC"],
+      onMouseDown: () => modes.deactivate(),
+    });
 
     return ret;
   },
@@ -137,13 +130,18 @@ export default {
 
     state.currFilter.value = "";
 
-    state.availOptions.value = stack.nav.value.root.items
-      .filter((item) => item.id != selected.stack_id);
-
-    stack.getRoot().then((items) =>
-      state.availOptions.value = items
-        .filter((item) => item.id != selected.stack_id)
+    state.availOptions.value = stack.nav.value.root.items.filter(
+      (item) => item.id != selected.stack_id,
     );
+
+    stack
+      .getRoot()
+      .then(
+        (items) =>
+          (state.availOptions.value = items.filter(
+            (item) => item.id != selected.stack_id,
+          )),
+      );
 
     state.selected.value = state.options.value[0]?.id || "";
     state.dn.value = dn();
@@ -197,7 +195,7 @@ export default {
               onKeyDown={(event) => {
                 event.stopPropagation();
                 switch (true) {
-                  case event.metaKey && event.key === "Enter":
+                  case event.altKey && event.key === "Enter":
                     state.accept_meta(stack, modes);
                     return;
 
@@ -216,7 +214,7 @@ export default {
                     state.selectDown();
                     break;
 
-                  case event.ctrlKey && event.key === "p" ||
+                  case (event.ctrlKey && event.key === "p") ||
                     event.key === "ArrowUp":
                     event.preventDefault();
                     state.selectUp();
@@ -227,36 +225,35 @@ export default {
           </div>
         </div>
 
-        <div style="
+        <div
+          style="
         padding:1ch;
-        ">
-          {state.options.value.map(
-            (item) => {
-              return (
-                <div
-                  className={"terserow" +
-                    (item.id == state.selected.value ? " hover" : "")}
-                  style={{
-                    display: "flex",
-                    width: "100%",
-                    overflow: "hidden",
-                    padding: "0.5ch 0.75ch",
-                    justifyContent: "space-between",
-                    borderRadius: "6px",
-                    cursor: "pointer",
-                  }}
-                  onMouseDown={() => {
-                    state.selected.value = item.id;
-                    state.accept(stack, modes);
-                  }}
-                >
-                  <div>
-                    {item.name}
-                  </div>
-                </div>
-              );
-            },
-          )}
+        "
+        >
+          {state.options.value.map((item) => {
+            return (
+              <div
+                className={
+                  "terserow" + (item.id == state.selected.value ? " hover" : "")
+                }
+                style={{
+                  display: "flex",
+                  width: "100%",
+                  overflow: "hidden",
+                  padding: "0.5ch 0.75ch",
+                  justifyContent: "space-between",
+                  borderRadius: "6px",
+                  cursor: "pointer",
+                }}
+                onMouseDown={() => {
+                  state.selected.value = item.id;
+                  state.accept(stack, modes);
+                }}
+              >
+                <div>{item.name}</div>
+              </div>
+            );
+          })}
         </div>
       </div>
     );

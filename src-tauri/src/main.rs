@@ -11,7 +11,10 @@ mod content_bus;
 mod content_type;
 mod http;
 mod serve;
+
+#[cfg(target_os = "macos")]
 mod spotlight;
+
 mod state;
 mod store;
 mod ui;
@@ -44,11 +47,13 @@ async fn main() {
     };
     info!(db_path, "let's go");
 
-    if command_name() == "stacks" {
-        cli::cli(&db_path).await;
-    } else {
-        serve::serve(context, db_path).await;
-    }
+    serve::serve(context, db_path).await;
+
+    // if command_name() == "stacks" {
+    //     cli::cli(&db_path).await;
+    // } else {
+    //     serve::serve(context, db_path).await;
+    // }
 }
 
 fn command_name() -> String {

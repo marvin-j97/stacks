@@ -12,7 +12,10 @@ use crate::clipboard;
 use crate::commands;
 use crate::content_bus;
 use crate::http;
+
+#[cfg(target_os = "macos")]
 use crate::spotlight;
+
 use crate::state::{SharedState, State};
 
 pub async fn serve<A: tauri::Assets>(context: tauri::Context<A>, db_path: String) {
@@ -37,6 +40,9 @@ pub async fn serve<A: tauri::Assets>(context: tauri::Context<A>, db_path: String
         .on_system_tray_event(|app, event| {
             if let tauri::SystemTrayEvent::MenuItemClick { id, .. } = event {
                 match id.as_str() {
+                    "open" => {
+                        app.get_window("main").unwrap().show().unwrap();
+                    }
                     "check-updates" => {
                         app.trigger_global("tauri://update", None);
                     }
@@ -84,11 +90,13 @@ pub async fn serve<A: tauri::Assets>(context: tauri::Context<A>, db_path: String
             commands::store_add_to_new_stack,
             commands::store_new_stack,
             commands::store_mark_as_cross_stream,
-            commands::spotlight_update_shortcut,
-            commands::spotlight_get_shortcut,
-            commands::spotlight_hide,
+            // TODO: MAC
+            // commands::spotlight_update_shortcut,
+            // commands::spotlight_get_shortcut,
+            // commands::spotlight_hide,
         ])
         .setup(move |app| {
+            #[cfg(target_os = "macos")]
             app.set_activation_policy(tauri::ActivationPolicy::Accessory);
 
             let window = app.get_window("main").unwrap();
@@ -96,8 +104,8 @@ pub async fn serve<A: tauri::Assets>(context: tauri::Context<A>, db_path: String
             #[cfg(debug_assertions)]
             if std::env::var("STACK_DEVTOOLS").is_ok() {
                 window.open_devtools();
-                use tauri_plugin_positioner::{Position, WindowExt};
-                let _ = window.move_window(Position::Center);
+                // use tauri_plugin_positioner::{Position, WindowExt};
+                // let _ = window.move_window(Position::Center);
             }
 
             let (packet_sender, _) = std::sync::mpsc::channel();
@@ -111,19 +119,22 @@ pub async fn serve<A: tauri::Assets>(context: tauri::Context<A>, db_path: String
             http::start(app.handle().clone(), state.clone(), &db_path);
             clipboard::start(app.handle(), &state);
 
-            let shortcut = state.with_lock(|state| {
-                let settings = state.store.settings_get();
-                settings
-                    .and_then(|s| s.activation_shortcut)
-                    .unwrap_or(spotlight::Shortcut {
-                        ctrl: true,
-                        shift: false,
-                        alt: false,
-                        command: false,
-                    })
-            });
-            spotlight::init(&window).unwrap();
-            spotlight::register_shortcut(&window, &shortcut.to_macos_shortcut()).unwrap();
+            #[cfg(target_os = "macos")]
+            {
+                let shortcut = state.with_lock(|state| {
+                    let settings = state.store.settings_get();
+                    settings
+                        .and_then(|s| s.activation_shortcut)
+                        .unwrap_or(spotlight::Shortcut {
+                            ctrl: true,
+                            shift: false,
+                            alt: false,
+                            command: false,
+                        })
+                });
+                spotlight::init(&window).unwrap();
+                spotlight::register_shortcut(&window, &shortcut.to_macos_shortcut()).unwrap();
+            }
 
             Ok(())
         })
@@ -151,7 +162,7 @@ fn init_tracing() {
 
 fn system_tray(version: &str) -> SystemTray {
     let menu = SystemTrayMenu::new()
-        .add_item(CustomMenuItem::new("".to_string(), "Stacks").disabled())
+        .add_item(CustomMenuItem::new("open".to_string(), "Stacks"))
         .add_item(CustomMenuItem::new("".to_string(), format!("Version {}", version)).disabled())
         .add_native_item(tauri::SystemTrayMenuItem::Separator)
         .add_item(CustomMenuItem::new(

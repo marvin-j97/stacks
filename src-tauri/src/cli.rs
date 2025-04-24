@@ -26,6 +26,8 @@ struct Args {
 pub async fn cli(db_path: &str) {
     let args = Args::parse();
 
+    eprintln!("Connecting to {db_path:?}");
+
     let socket_path = Path::new(db_path).join("sock");
     let stream = tokio::net::UnixStream::connect(socket_path)
         .await

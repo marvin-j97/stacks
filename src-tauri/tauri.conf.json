@@ -55,10 +55,10 @@
     "windows": [
       {
         "fullscreen": false,
-        "alwaysOnTop": true,
-        "visible": false,
-        "decorations": false,
-        "transparent": true,
+        "alwaysOnTop": false,
+        "visible": true,
+        "decorations": true,
+        "transparent": false,
         "width": 1000,
         "height": 600,
         "title": "stacks"

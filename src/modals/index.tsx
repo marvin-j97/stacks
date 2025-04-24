@@ -72,18 +72,18 @@ export const modes = {
 
   attemptAction(event: KeyboardEvent, stack: Stack): boolean {
     switch (true) {
-      case event.metaKey && event.key === "k":
+      case event.altKey && event.key === "k":
         event.preventDefault();
         modes.toggle(stack, actionsMode);
         return true;
 
       // https://github.com/cablehead/stacks/issues/40
-      case (matchKeyEvent(event, {
+      case matchKeyEvent(event, {
         meta: true,
         alt: true,
         shift: true,
         code: "KeyN",
-      })):
+      }):
         event.preventDefault();
         (async () => {
           await invoke("store_new_stack", {
@@ -93,17 +93,17 @@ export const modes = {
         })();
         return true;
 
-      case event.metaKey && event.key === ",":
+      case event.altKey && event.key === ",":
         event.preventDefault();
         modes.toggle(stack, settingsMode);
         return true;
 
-      case (matchKeyEvent(event, { meta: true, shift: true, code: "KeyN" })):
+      case matchKeyEvent(event, { alt: true, shift: true, code: "KeyN" }):
         event.preventDefault();
         modes.toggle(stack, newNoteMode);
         return true;
 
-      case (matchKeyEvent(event, { meta: true, alt: true, code: "KeyN" })):
+      case matchKeyEvent(event, { alt: true, shift: true, code: "KeyN" }):
         event.preventDefault();
         (async () => {
           await invoke("store_new_stack", {
@@ -112,12 +112,12 @@ export const modes = {
         })();
         return true;
 
-      case (matchKeyEvent(event, { meta: true, key: "n" })):
+      case matchKeyEvent(event, { alt: true, key: "n" }):
         event.preventDefault();
         modes.toggle(stack, newMode);
         return true;
 
-      case matchKeyEvent(event, { meta: true, key: "u" }):
+      case matchKeyEvent(event, { alt: true, key: "u" }):
         event.preventDefault();
         modes.toggle(stack, filterContentTypeMode);
         return true;
@@ -125,10 +125,7 @@ export const modes = {
 
     const mode = this.active.value;
     for (const hotKey of mode.hotKeys(stack, this)) {
-      if (
-        hotKey.matchKeyEvent &&
-        hotKey.matchKeyEvent(event)
-      ) {
+      if (hotKey.matchKeyEvent && hotKey.matchKeyEvent(event)) {
         event.preventDefault();
         hotKey.onMouseDown(event);
         return true;

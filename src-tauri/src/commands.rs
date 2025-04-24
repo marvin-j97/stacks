@@ -6,8 +6,12 @@ use tauri::Manager;
 use scru128::Scru128Id;
 
 use crate::content_type::process_command;
+
+#[cfg(target_os = "macos")]
 use crate::spotlight;
+#[cfg(target_os = "macos")]
 use crate::spotlight::Shortcut;
+
 use crate::state::SharedState;
 use crate::store::{
     InProgressStream, MimeType, Movement, Settings, StackLockStatus, StackSortOrder,
@@ -708,11 +712,15 @@ pub fn store_nav_select_right(state: tauri::State<SharedState>) -> Nav {
     })
 }
 
+#[cfg(target_os = "macos")]
 use cocoa::base::nil;
+#[cfg(target_os = "macos")]
 use cocoa::foundation::NSString;
+#[cfg(target_os = "macos")]
 use objc::{msg_send, sel, sel_impl};
 
 pub fn write_to_clipboard(mime_type: &str, data: &[u8]) -> Option<i64> {
+    #[cfg(target_os = "macos")]
     unsafe {
         let nsdata: *mut objc::runtime::Object = msg_send![objc::class!(NSData), alloc];
         let nsdata: *mut objc::runtime::Object =
@@ -735,6 +743,9 @@ pub fn write_to_clipboard(mime_type: &str, data: &[u8]) -> Option<i64> {
         }
         Some(i)
     }
+
+    #[cfg(not(target_os = "macos"))]
+    None
 }
 
 #[tauri::command]
@@ -1147,6 +1158,7 @@ pub fn store_stack_sort_auto(
 
 #[tauri::command]
 #[tracing::instrument(skip(state, app))]
+#[cfg(target_os = "macos")]
 pub fn spotlight_update_shortcut(
     state: tauri::State<'_, SharedState>,
     app: tauri::AppHandle,
@@ -1163,6 +1175,7 @@ pub fn spotlight_update_shortcut(
 
 #[tauri::command]
 #[tracing::instrument(skip(state))]
+#[cfg(target_os = "macos")]
 pub fn spotlight_get_shortcut(state: tauri::State<'_, SharedState>) -> Shortcut {
     state.with_lock(|state| {
         let settings = state.store.settings_get();
@@ -1179,6 +1192,7 @@ pub fn spotlight_get_shortcut(state: tauri::State<'_, SharedState>) -> Shortcut 
 
 #[tauri::command]
 #[tracing::instrument(skip(app))]
+#[cfg(target_os = "macos")]
 pub fn spotlight_hide(app: tauri::AppHandle) {
     let window = app.get_window("main").unwrap();
     spotlight::hide(&window).unwrap();

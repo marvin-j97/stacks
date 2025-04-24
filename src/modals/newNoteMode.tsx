@@ -38,10 +38,7 @@ export default {
   hotKeys: (stack: Stack, modes: Modes) => [
     {
       name: "Capture",
-      keys: [
-        <Icon name="IconCommandKey" />,
-        <Icon name="IconReturnKey" />,
-      ],
+      keys: [<Icon name="IconCommandKey" />, <Icon name="IconReturnKey" />],
       onMouseDown: () => state.accept_meta(stack, modes),
     },
     {
@@ -100,13 +97,12 @@ export default {
                   modes.deactivate();
                   break;
 
-                case event.metaKey && event.key === "Enter":
+                case event.altKey && event.key === "Enter":
                   state.accept_meta(stack, modes);
                   break;
               }
             }}
-          >
-          </textarea>
+          ></textarea>
         </div>
       </div>
     );

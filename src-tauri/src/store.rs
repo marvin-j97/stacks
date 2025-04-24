@@ -4,6 +4,7 @@ use scru128::Scru128Id;
 use serde::{Deserialize, Serialize};
 use ssri::Integrity;
 
+#[cfg(target_os = "macos")]
 use crate::spotlight;
 
 #[derive(PartialEq, Debug, Serialize, Deserialize, Clone)]
@@ -235,6 +236,8 @@ pub struct Settings {
     pub openai_access_token: String,
     pub openai_selected_model: String,
     pub cross_stream_access_token: Option<String>,
+
+    #[cfg(target_os = "macos")]
     pub activation_shortcut: Option<spotlight::Shortcut>,
 }
 

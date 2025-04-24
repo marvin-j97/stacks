@@ -31,8 +31,9 @@ async function globalKeyHandler(event: KeyboardEvent) {
   if (!stack) return;
 
   function adjustFontSize(delta: number) {
-    const currentFontSize =
-      window.getComputedStyle(document.documentElement).fontSize;
+    const currentFontSize = window.getComputedStyle(
+      document.documentElement,
+    ).fontSize;
     const newFontSize = parseFloat(currentFontSize) + delta + "px";
     document.documentElement.style.fontSize = newFontSize;
   }
@@ -68,17 +69,17 @@ async function globalKeyHandler(event: KeyboardEvent) {
       modes.deactivate();
       return;
 
-    case matchKeyEvent(event, { meta: true, key: "z" }):
+    case matchKeyEvent(event, { alt: true, key: "z" }):
       event.preventDefault();
       stack.undo();
       return;
 
-    case matchKeyEvent(event, { meta: true, key: "t" }):
+    case matchKeyEvent(event, { alt: true, key: "t" }):
       event.preventDefault();
       stack.touch();
       return;
 
-    case matchKeyEvent(event, { meta: true, key: "l" }):
+    case matchKeyEvent(event, { alt: true, key: "l" }):
       event.preventDefault();
       stack.toggleLock();
       return;
@@ -97,19 +98,19 @@ async function globalKeyHandler(event: KeyboardEvent) {
       return;
     }
 
-    case matchKeyEvent(event, { meta: true, key: "0" }):
+    case matchKeyEvent(event, { alt: true, key: "0" }):
       event.preventDefault();
       stack.reset();
       return;
 
-    case matchKeyEvent(event, { meta: true, ctrl: true, key: "n" }) ||
-      matchKeyEvent(event, { meta: true, key: "ArrowDown" }):
+    case matchKeyEvent(event, { alt: true, ctrl: true, key: "n" }) ||
+      matchKeyEvent(event, { alt: true, key: "ArrowDown" }):
       event.preventDefault();
       stack.moveDown();
       return;
 
-    case matchKeyEvent(event, { meta: true, ctrl: true, key: "p" }) ||
-      matchKeyEvent(event, { meta: true, key: "ArrowUp" }):
+    case matchKeyEvent(event, { alt: true, ctrl: true, key: "p" }) ||
+      matchKeyEvent(event, { alt: true, key: "ArrowUp" }):
       event.preventDefault();
       stack.moveUp();
       return;
@@ -138,8 +139,8 @@ async function globalKeyHandler(event: KeyboardEvent) {
       stack.selectUpStack();
       return;
 
-    case matchKeyEvent(event, { meta: true, key: "Meta" }) ||
-      matchKeyEvent(event, { meta: true, key: "c" }):
+    case matchKeyEvent(event, { alt: true, key: "Meta" }) ||
+      matchKeyEvent(event, { alt: true, key: "c" }):
       // avoid capturing command-c
       return;
 
@@ -186,15 +187,14 @@ export function App() {
     <main
       className={theme.value === "light" ? lightThemeClass : darkThemeClass}
     >
-      {stack
-        ? (
-          <>
-            {!modes.isActive(editorMode) &&
-              !modes.isActive(newNoteMode) &&
-              !modes.isActive(pipeToCommand) &&
-              !modes.isActive(renameStackMode) &&
-              <Filter stack={stack} />}
-            <div style="
+      {stack ? (
+        <>
+          {!modes.isActive(editorMode) &&
+            !modes.isActive(newNoteMode) &&
+            !modes.isActive(pipeToCommand) &&
+            !modes.isActive(renameStackMode) && <Filter stack={stack} />}
+          <div
+            style="
             display: flex;
             flex-direction: column;
             height: 100%;
@@ -204,16 +204,18 @@ export function App() {
             padding-left:1ch;
             padding-right:1ch;
             position: relative;
-        ">
-              <Nav stack={stack} />
-              <MetaPanel stack={stack} />
-              {modes.isActive(actionsMode) && <Actions stack={stack} />}
-              {modes.showActiveOverlay(stack)}
-            </div>
-            <StatusBar stack={stack} />
-          </>
-        )
-        : "loading"}
+        "
+          >
+            <Nav stack={stack} />
+            <MetaPanel stack={stack} />
+            {modes.isActive(actionsMode) && <Actions stack={stack} />}
+            {modes.showActiveOverlay(stack)}
+          </div>
+          <StatusBar stack={stack} />
+        </>
+      ) : (
+        "loading"
+      )}
     </main>
   );
 }
